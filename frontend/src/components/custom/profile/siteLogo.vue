@@ -1,5 +1,13 @@
 <script setup>
 import { defineProps } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+
+const router = useRouter()
+
+const goToMainPage = () => {
+  console.log('Клик')
+  router.push('/mainPage')
+}
 
 defineProps({
   isVertical: Boolean // Определяет вид логотипа: вертикальное или горизонтальное отображение
@@ -8,7 +16,11 @@ defineProps({
 
 <template>
   <!-- Контейнер для всего лого -->
-  <div class="flex items-center h-[64px] gap-4 w-fit" :class="{ 'flex-col': isVertical }">
+  <div
+    @click="goToMainPage"
+    class="flex items-center h-[64px] gap-4 w-fit cursor-default"
+    :class="{ 'flex-col': isVertical }"
+  >
     <!-- Контейнер только для лого -->
     <div class="flex items-center max-w-[284px]">
       <!-- Круг -->

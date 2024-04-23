@@ -9,14 +9,14 @@
           id="search"
           type="search"
           placeholder="Поиск по товару..."
-          class="pl-10 min-w-96"
+          class="pl-10 min-w-[100px]"
         />
 
         <span class="absolute start-0 inset-y-2 flex px-2">
           <Search class="size-6 text-muted-foreground" />
         </span>
       </div>
-      <div class="flex xl:mr-5 xl:ml-96 3xl:ml-90 intems-center gap-4">
+      <div class="flex xl:mr-10 xl:ml-96 3xl:ml-90 intems-center gap-4">
         <button variant="link">Корзина</button>
         <ShoppingCart />
         <button @click="goToLogOut" variant="link">Выйти</button>
@@ -25,21 +25,21 @@
     </div>
 
     <div class="flex flex-row gap-5 justify-start ml-5 mt-24">
-      <ScrollArea class="min-h-[500px] min-w-[300px] rounded-md border p-4">
+      <ScrollArea class="min-h-[500px] min-w-[300px] max-w-[800px] rounded-md border p-4">
         <div v-for="cat in category" :key="cat.id" class="flex mt-2 gap-1">
           <Cpu />
           <button variant="link">{{ cat.name_category }}</button>
         </div>
       </ScrollArea>
       <div class="flex justify-center items-center">
-        <ScrollArea class="min-h-[500px] min-w-[400px] w-[1100px] rounded-md border p-4">
+        <ScrollArea class="min-h-[500px] min-w-[200px] w-[1100px] rounded-md">
           <div class="flex flex-wrap gap-12 ml-10">
             <div
               v-for="item in queryItems"
               :key="item.id"
               class="border border-gray-200 w-full md:w-1/2 lg:w-1/3 xl:w-1/4 bg-white rounded-lg p-4 relative"
             >
-              <div class="w-[200px]">
+              <div class="w-[150px]">
                 <AspectRatio class="flex ml-3" :ratio="16 / 9">
                   <img
                     :src="`/images/${item.img_components}`"
@@ -57,9 +57,11 @@
                     {{ item.price_components }} <span class="text-slate-600">руб</span>
                   </p>
                   <div class="absolute bottom-2 right-2">
-                    <Button class="bg-orange-400 w-32 text-white" variant="outline">
-                      Открыть
-                    </Button>
+                    <RouterLink :to="{ path: `/cardPage/${item.id_components}` }">
+                      <Button class="bg-orange-400 w-32 text-white" variant="outline">
+                        Открыть
+                      </Button></RouterLink
+                    >
                   </div>
                 </div>
               </div>
@@ -88,6 +90,8 @@ const router = useRouter()
 
 const query = ref('')
 
+console.log(localStorage)
+
 const queryItems = computed(() => {
   let item = items.value
   let search = query.value
@@ -96,9 +100,9 @@ const queryItems = computed(() => {
 
   // console.log(selectedCategory)
 
-  selectedCategory.forEach((element) => {
-    console.log(element)
-  })
+  // selectedCategory.forEach((element) => {
+  //   console.log(element)
+  // })
 
   if (search) {
     item = item.filter((elem) => {
@@ -112,6 +116,7 @@ const queryItems = computed(() => {
 })
 
 const goToLogOut = () => {
+  localStorage.clear()
   router.push('/')
 }
 

@@ -19,8 +19,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
 
 
-
-
     $query = $pdo->query(
 
     "SELECT * from category_product");
@@ -29,6 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     // Выводим данные в формате JSON
     header('Content-Type: application/json');
     echo json_encode($data);
+    
 } else {
     echo json_encode(['error' => 'Only GET requests are allowed']);
 }

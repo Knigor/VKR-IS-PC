@@ -6,6 +6,7 @@ import store from './store'
 import MainPage from './views/MainPage.vue'
 import AuthPage from './views/AuthPage.vue'
 import RegisterPage from './views/RegisterPage.vue'
+import cardPage from './views/cardPage.vue'
 
 const router = createRouter({
   routes: [
@@ -20,6 +21,11 @@ const router = createRouter({
     {
       path: '/RegisterPage',
       component: RegisterPage
+    },
+    {
+      path: '/cardPage/:id',
+      name: cardPage,
+      component: cardPage
     }
   ],
   history: createWebHistory()
