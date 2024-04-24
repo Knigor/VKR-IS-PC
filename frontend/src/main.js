@@ -7,6 +7,8 @@ import MainPage from './views/MainPage.vue'
 import AuthPage from './views/AuthPage.vue'
 import RegisterPage from './views/RegisterPage.vue'
 import cardPage from './views/cardPage.vue'
+import cartPage from '@/components/custom/profile/cartPage.vue'
+import { createPinia } from 'pinia'
 
 const router = createRouter({
   routes: [
@@ -26,6 +28,11 @@ const router = createRouter({
       path: '/cardPage/:id',
       name: cardPage,
       component: cardPage
+    },
+    {
+      path: '/cartPage',
+      name: cartPage,
+      component: cartPage
     }
   ],
   history: createWebHistory()
@@ -33,6 +40,8 @@ const router = createRouter({
 
 const app = createApp(App)
 
-app.use(router)
+const pinia = createPinia()
+
+app.use(router).use(pinia)
 app.mount('#app')
 app.use(store)

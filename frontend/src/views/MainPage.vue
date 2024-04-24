@@ -17,7 +17,7 @@
         </span>
       </div>
       <div class="flex xl:mr-10 xl:ml-96 3xl:ml-90 intems-center gap-4">
-        <button variant="link">Корзина</button>
+        <button @click="goToCart" variant="link">Корзина</button>
         <ShoppingCart />
         <button @click="goToLogOut" variant="link">Выйти</button>
         <LogOut @click="goToLogOut" />
@@ -25,10 +25,10 @@
     </div>
 
     <div class="flex flex-row gap-5 justify-start ml-5 mt-24">
-      <ScrollArea class="min-h-[500px] min-w-[300px] max-w-[800px] rounded-md border p-4">
+      <ScrollArea class="min-h-[500px] min-w-[260px] max-w-[400px] rounded-md border p-4">
         <div v-for="cat in category" :key="cat.id" class="flex mt-2 gap-1">
           <Cpu />
-          <button variant="link">{{ cat.name_category }}</button>
+          <button @click="selectedCategory(cat)" variant="link">{{ cat.name_category }}</button>
         </div>
       </ScrollArea>
       <div class="flex justify-center items-center">
@@ -88,6 +88,10 @@ import { useRoute, useRouter } from 'vue-router'
 
 const router = useRouter()
 
+const goToCart = () => {
+  router.push('/cartPage')
+}
+
 const query = ref('')
 
 console.log(localStorage)
@@ -96,13 +100,6 @@ const queryItems = computed(() => {
   let item = items.value
   let search = query.value
   let cat = category.value
-  let selectedCategory
-
-  // console.log(selectedCategory)
-
-  // selectedCategory.forEach((element) => {
-  //   console.log(element)
-  // })
 
   if (search) {
     item = item.filter((elem) => {
@@ -141,6 +138,10 @@ onMounted(async () => {
     console.error(err)
   }
 })
+
+const selectedCategory = (selectedCat) => {
+  query.value = selectedCat.name_category
+}
 </script>
 
 <style>

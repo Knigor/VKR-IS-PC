@@ -16,60 +16,75 @@
         </span>
       </div>
       <div class="flex xl:mr-10 xl:ml-96 3xl:ml-90 intems-center gap-4">
-        <button variant="link">Корзина</button>
+        <button @click="goToCart" variant="link">Корзина</button>
         <ShoppingCart />
         <button @click="goToLogOut" variant="link">Выйти</button>
         <LogOut @click="goToLogOut" />
       </div>
     </div>
 
-    <div class="flex mt-28 ml-5 mr-5 h-[400px] gap-20 border-2">
+    <div class="flex mt-28 ml-5 mr-5 h-[400px] gap-20 justify-between border-2">
       <!-- Левый блок с описанием-->
       <div class="h-[200px] w-[800px] ml-5 mt-5 bg-white flex flex-col">
         <h1 class="font-bold">{{ element.name_components }}</h1>
         <div class="flex mt-5 gap-12">
-          <AspectRatio :ratio="16 / 9">
-            <img
-              class="border-gray-400 border-4"
-              :src="`/images/${element.img_components}`"
-              alt="Пусто"
-            />
-          </AspectRatio>
+          <img
+            class="border-gray-400 border-2"
+            :src="`/images/${element.img_components}`"
+            alt="Пусто"
+            style="width: 300px; height: 200px; object-fit: cover"
+          />
 
           <div class="flex flex-col gap-2">
-            <p class="text-gray-400">Объем: <span class="text-black">2x 16Гб;</span></p>
+            <p class="text-gray-400" v-for="property in propertyData" :key="property.id_property">
+              {{ property.value_property + ':' }}
+              <span class="text-black"> {{ property.key_property }} </span>
+            </p>
           </div>
-          <Select>
-            <SelectTrigger class="text-orange max-w-[200px]">
-              <!-- добавлен класс max-w-[100px] -->
-              <SelectValue placeholder="Поставьте оценку" />
-            </SelectTrigger>
-            <SelectContent class="max-w-[200px]">
-              <!-- добавлен класс max-w-[100px] -->
-              <SelectGroup>
-                <SelectLabel>Поставьте оценку</SelectLabel>
-                <SelectItem value="one"> 1 </SelectItem>
-                <SelectItem value="two"> 2 </SelectItem>
-                <SelectItem value="three"> 3 </SelectItem>
-                <SelectItem value="four"> 4 </SelectItem>
-                <SelectItem value="five"> 5 </SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+
+          <div class="flex flex-col">
+            <Select>
+              <SelectTrigger class="text-orange max-w-[200px]">
+                <!-- добавлен класс max-w-[100px] -->
+                <SelectValue placeholder="Поставьте оценку" />
+              </SelectTrigger>
+              <SelectContent class="max-w-[200px]">
+                <!-- добавлен класс max-w-[100px] -->
+                <SelectGroup>
+                  <SelectLabel>Поставьте оценку</SelectLabel>
+                  <SelectItem value="one"> 1 </SelectItem>
+                  <SelectItem value="two"> 2 </SelectItem>
+                  <SelectItem value="three"> 3 </SelectItem>
+                  <SelectItem value="four"> 4 </SelectItem>
+                  <SelectItem value="five"> 5 </SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+            <Button class="mt-5"> Оставить оценку </Button>
+          </div>
         </div>
       </div>
 
       <!-- Правый блок с корзиной-->
       <div class="h-[200px] w-[200px] flex flex-col bg-white justify-center items-center">
         <div class="flex flex-col gap-2">
-          <p>{{ element.price_components }} <span class="text-gray-400">руб</span></p>
-          <Button> <ShoppingCart color="" class="w-4 h-4 mr-2" /> В корзину </Button>
+          <p>
+            {{ element.price_components }}
+            <span class="text-gray-400">руб</span>
+          </p>
+          <Button @click="addToCart">
+            <ShoppingCart color="" class="w-4 h-4 mr-2" /> В корзину
+          </Button>
         </div>
 
         <div class="flex gap-5 justify-center items-center mt-2">
-          <Button variant="outline" class="bg-white border-0 text-black">-</Button>
-          <p>1</p>
-          <Button variant="outline" class="bg-white border-0 text-black">+</Button>
+          <Button @click="countMinus" variant="outline" class="bg-white border-0 text-black"
+            >-</Button
+          >
+          <p>{{ count }}</p>
+          <Button @click="countPlus" variant="outline" class="bg-white border-0 text-black"
+            >+</Button
+          >
         </div>
       </div>
     </div>
@@ -105,9 +120,31 @@ const getIdComponent = useRoute()
 
 const cardData = ref([])
 
+const propertyData = ref([])
+
 const idComponents = getIdComponent.params.id
 
 let element = ref({})
+
+// Здесь будет логика на счетчик
+
+let count = ref(1)
+
+let stock = ref({})
+
+const countPlus = () => {
+  if (count.value < stock.value.quantity_stock) {
+    count.value++
+    console.log((element.value.price_components *= 2))
+  }
+}
+
+const countMinus = () => {
+  if (count.value > 1) {
+    count.value--
+    element.value.price_components /= 2
+  }
+}
 
 onMounted(async () => {
   try {
@@ -126,11 +163,47 @@ onMounted(async () => {
     element.value.name_components = item.name_components
     element.value.price_components = item.price_components
 
-    console.log(element.value.name_components)
+    // Массив для localStorage
   } catch (error) {
     console.error('Ошибка при загрузке данных:', error)
   }
+
+  const apiFormData = new FormData()
+
+  apiFormData.append('id_components', getIdComponent.params.id)
+
+  try {
+    const response = await axios.post('http://localhost/postPropertyAPI.php', apiFormData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+
+    propertyData.value = response.data
+  } catch (error) {
+    console.error('Ошибка при отправке данных:', error)
+  }
+
+  // Получаем кол-во товара на складе
+
+  try {
+    const response = await axios.post('http://localhost/postStockAPI.php', apiFormData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+
+    stock.value = response.data
+  } catch (error) {
+    console.error('Ошибка при отправке данных:', error)
+  }
 })
+
+console.log(propertyData)
+
+const goToCart = () => {
+  router.push('/cartPage')
+}
 
 const goToLogOut = () => {
   localStorage.clear()
@@ -138,4 +211,4 @@ const goToLogOut = () => {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style></style>

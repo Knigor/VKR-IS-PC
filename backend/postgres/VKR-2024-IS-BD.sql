@@ -95,7 +95,6 @@ ALTER SEQUENCE public.components_stock_stock_id_seq OWNED BY public.components_s
 
 CREATE TABLE public.componets (
     id_components integer NOT NULL,
-    id_score integer,
     name_components character varying(100) NOT NULL,
     price_components character varying(200) NOT NULL,
     img_components character varying(200) NOT NULL
@@ -207,6 +206,7 @@ ALTER SEQUENCE public.property_components_id_property_seq OWNED BY public.proper
 CREATE TABLE public.rating (
     id_score integer NOT NULL,
     id_user integer NOT NULL,
+    id_components integer,
     score integer NOT NULL
 );
 
@@ -364,6 +364,7 @@ COPY public.category_product (id_catergory, name_category) FROM stdin;
 
 COPY public.components_stock (stock_id, id_components, quantity_stock) FROM stdin;
 1	1	5
+2	7	9
 \.
 
 
@@ -371,24 +372,24 @@ COPY public.components_stock (stock_id, id_components, quantity_stock) FROM stdi
 -- Data for Name: componets; Type: TABLE DATA; Schema: public; Owner: user
 --
 
-COPY public.componets (id_components, id_score, name_components, price_components, img_components) FROM stdin;
-3	\N	Оперативная память Kingston Fury Beast KF432C16BB1K2/32 DDR4 - 2x 16ГБ 3200МГц, DIMM, Ret	10990	memory2.jpg
-1	1	Оперативная память Kingston Fury Beast Black KF432C16BBK2/16 DDR4 - 2x 8ГБ 3200МГц, DIMM, Ret	5990	memory.jpg
-4	\N	Оперативная память Patriot Signature PSD48G266681 DDR4 - 1x 8ГБ 2666МГц, DIMM, Ret	2090	memory3.jpg
-5	\N	Оперативная память Patriot Viper Elite II PVE2432G400C0K DDR4 - 2x 16ГБ 4000МГц, DIMM, Ret	9990	memory4.jpg
-7	\N	Материнская плата MSI PRO H610M-E DDR4, LGA 1700, Intel H610, mATX, Ret	8670	matherboard1.jpg
-8	\N	Материнская плата ASUS PRIME B650-PLUS, SocketAM5, AMD B650, ATX, Ret	22610	matherboard2.jpg
-9	\N	Материнская плата MSI A520M-A PRO, SocketAM4, AMD A520, mATX, Ret	7220	matherboard3.jpg
-11	\N	Материнская плата MSI MPG B550 GAMING PLUS, SocketAM4, AMD B550, ATX, Ret	16890	matherboard4.jpg
-12	\N	Видеокарта Palit NVIDIA GeForce RTX 4080 Super RTX4080 SUPER GAMINGPRO 16ГБ GamingPro, GDDR6X, Ret 	147500	videocard.jpg
-13	\N	Видеокарта ASUS NVIDIA GeForce RTX 3050 DUAL-RTX3050-O6G 6ГБ Dual, GDDR6, OC, Ret	24900	videocard1.jpg
-14	\N	Видеокарта Palit NVIDIA GeForce RTX 3060 PA-RTX3060 DUAL 12G 12ГБ Dual, GDDR6, LHR, Ret	38500	videocard2.jpg
-15	\N	Видеокарта GIGABYTE NVIDIA GeForce RTX 3060 GV-N3060GAMING OC-12GD 2.0 LHR 12ГБ GDDR6, OC, LHR, Ret	44100	videocard3.jpg
-16	\N	Процессор Intel Core i5 12400F, LGA 1700, OEM [cm8071504650609 srl5z]	14490	cpu1.jpg
-17	\N	Процессор AMD Ryzen 3 2200G, AM4, OEM [yd2200c5m4mfb]	7490	cpu2.jpg
-6	\N	Оперативная память Kingston Fury Beast Black KF432C16BBK2/32 DDR4 - 2x 16ГБ 3200МГц, DIMM, Ret	9880	memory4.jpg
-19	\N	Процессор AMD Ryzen 5 5600, AM4, OEM [100-000000927]	13190	cpu3.jpg
-18	\N	Процессор AMD Ryzen 5 5600, AM4, BOX [100-100000927cbx]	15990	cpu3.jpg
+COPY public.componets (id_components, name_components, price_components, img_components) FROM stdin;
+3	Оперативная память Kingston Fury Beast KF432C16BB1K2/32 DDR4 - 2x 16ГБ 3200МГц, DIMM, Ret	10990	memory2.jpg
+1	Оперативная память Kingston Fury Beast Black KF432C16BBK2/16 DDR4 - 2x 8ГБ 3200МГц, DIMM, Ret	5990	memory.jpg
+4	Оперативная память Patriot Signature PSD48G266681 DDR4 - 1x 8ГБ 2666МГц, DIMM, Ret	2090	memory3.jpg
+5	Оперативная память Patriot Viper Elite II PVE2432G400C0K DDR4 - 2x 16ГБ 4000МГц, DIMM, Ret	9990	memory4.jpg
+7	Материнская плата MSI PRO H610M-E DDR4, LGA 1700, Intel H610, mATX, Ret	8670	matherboard1.jpg
+8	Материнская плата ASUS PRIME B650-PLUS, SocketAM5, AMD B650, ATX, Ret	22610	matherboard2.jpg
+9	Материнская плата MSI A520M-A PRO, SocketAM4, AMD A520, mATX, Ret	7220	matherboard3.jpg
+11	Материнская плата MSI MPG B550 GAMING PLUS, SocketAM4, AMD B550, ATX, Ret	16890	matherboard4.jpg
+12	Видеокарта Palit NVIDIA GeForce RTX 4080 Super RTX4080 SUPER GAMINGPRO 16ГБ GamingPro, GDDR6X, Ret 	147500	videocard.jpg
+13	Видеокарта ASUS NVIDIA GeForce RTX 3050 DUAL-RTX3050-O6G 6ГБ Dual, GDDR6, OC, Ret	24900	videocard1.jpg
+14	Видеокарта Palit NVIDIA GeForce RTX 3060 PA-RTX3060 DUAL 12G 12ГБ Dual, GDDR6, LHR, Ret	38500	videocard2.jpg
+15	Видеокарта GIGABYTE NVIDIA GeForce RTX 3060 GV-N3060GAMING OC-12GD 2.0 LHR 12ГБ GDDR6, OC, LHR, Ret	44100	videocard3.jpg
+16	Процессор Intel Core i5 12400F, LGA 1700, OEM [cm8071504650609 srl5z]	14490	cpu1.jpg
+17	Процессор AMD Ryzen 3 2200G, AM4, OEM [yd2200c5m4mfb]	7490	cpu2.jpg
+6	Оперативная память Kingston Fury Beast Black KF432C16BBK2/32 DDR4 - 2x 16ГБ 3200МГц, DIMM, Ret	9880	memory4.jpg
+19	Процессор AMD Ryzen 5 5600, AM4, OEM [100-000000927]	13190	cpu3.jpg
+18	Процессор AMD Ryzen 5 5600, AM4, BOX [100-100000927cbx]	15990	cpu3.jpg
 \.
 
 
@@ -410,6 +411,11 @@ COPY public.property_components (id_property, value_property, key_property) FROM
 2	Частота	3200МГц
 3	Латентность	CL16
 4	Тайминги	16-18-18
+14	Форм-фактор	mATX
+15	Сокет	LGA, 1700; чипсет: Intel Z790
+16	Память	частотой до 5600 мГЦ
+17	Слоты	PCI-E E 4.0 x16 x 1
+18	Разъемы	M.2 x 4
 \.
 
 
@@ -417,8 +423,8 @@ COPY public.property_components (id_property, value_property, key_property) FROM
 -- Data for Name: rating; Type: TABLE DATA; Schema: public; Owner: user
 --
 
-COPY public.rating (id_score, id_user, score) FROM stdin;
-1	1	4
+COPY public.rating (id_score, id_user, id_components, score) FROM stdin;
+1	11	1	4
 \.
 
 
@@ -456,6 +462,11 @@ COPY public.stores_property (id_property, id_components) FROM stdin;
 2	1
 3	1
 4	1
+14	7
+15	7
+16	7
+17	7
+18	7
 \.
 
 
@@ -467,6 +478,8 @@ COPY public.users (id_user, email, fio, hash_password, login, role) FROM stdin;
 3	test@mail.ru	Давыдов Дмитрий Антонович	a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3	dima	Admin
 1	example@mail.ru	Петров Иван Сидорович	a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3	ivan123	Admin
 9	test123@mail.ru	Зубенко Михаил Петрович	a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3	aboba	User
+10	aboba@mail.ru	Кретов Игорь Олегович	a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3	aboba1	User
+11	test1@mail.ru	Тест Тест Тест	a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3	test	User
 \.
 
 
@@ -481,7 +494,7 @@ SELECT pg_catalog.setval('public.category_product_id_catergory_seq', 4, true);
 -- Name: components_stock_stock_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
 --
 
-SELECT pg_catalog.setval('public.components_stock_stock_id_seq', 1, true);
+SELECT pg_catalog.setval('public.components_stock_stock_id_seq', 2, true);
 
 
 --
@@ -502,7 +515,7 @@ SELECT pg_catalog.setval('public.order_id_order_seq', 1, true);
 -- Name: property_components_id_property_seq; Type: SEQUENCE SET; Schema: public; Owner: user
 --
 
-SELECT pg_catalog.setval('public.property_components_id_property_seq', 13, true);
+SELECT pg_catalog.setval('public.property_components_id_property_seq', 18, true);
 
 
 --
@@ -516,7 +529,7 @@ SELECT pg_catalog.setval('public.rating_id_score_seq', 1, true);
 -- Name: users_id_user_seq; Type: SEQUENCE SET; Schema: public; Owner: user
 --
 
-SELECT pg_catalog.setval('public.users_id_user_seq', 9, true);
+SELECT pg_catalog.setval('public.users_id_user_seq', 11, true);
 
 
 --
@@ -693,7 +706,7 @@ CREATE UNIQUE INDEX stores_property_pk ON public.stores_property USING btree (id
 -- Name: stores_rating_fk; Type: INDEX; Schema: public; Owner: user
 --
 
-CREATE INDEX stores_rating_fk ON public.componets USING btree (id_score);
+CREATE INDEX stores_rating_fk ON public.rating USING btree (id_components);
 
 
 --
@@ -719,14 +732,6 @@ ALTER TABLE ONLY public.components_stock
 
 
 --
--- Name: componets fk_componet_stores_ra_rating; Type: FK CONSTRAINT; Schema: public; Owner: user
---
-
-ALTER TABLE ONLY public.componets
-    ADD CONSTRAINT fk_componet_stores_ra_rating FOREIGN KEY (id_score) REFERENCES public.rating(id_score) ON UPDATE RESTRICT ON DELETE RESTRICT;
-
-
---
 -- Name: order fk_order_makes_ord_users; Type: FK CONSTRAINT; Schema: public; Owner: user
 --
 
@@ -748,6 +753,14 @@ ALTER TABLE ONLY public."order"
 
 ALTER TABLE ONLY public.rating
     ADD CONSTRAINT fk_rating_puts_scor_users FOREIGN KEY (id_user) REFERENCES public.users(id_user) ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+
+--
+-- Name: rating fk_rating_stores_ra_componet; Type: FK CONSTRAINT; Schema: public; Owner: user
+--
+
+ALTER TABLE ONLY public.rating
+    ADD CONSTRAINT fk_rating_stores_ra_componet FOREIGN KEY (id_components) REFERENCES public.componets(id_components) ON UPDATE RESTRICT ON DELETE RESTRICT;
 
 
 --
