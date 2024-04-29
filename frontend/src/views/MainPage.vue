@@ -16,11 +16,13 @@
           <Search class="size-6 text-muted-foreground" />
         </span>
       </div>
-      <div class="flex xl:mr-10 xl:ml-96 3xl:ml-90 intems-center gap-4">
-        <button @click="goToCart" variant="link">Корзина</button>
-        <ShoppingCart />
+      <div class="flex intems-center gap-2">
+        <p class="text-nowrap cursor-pointer">{{ role }}</p>
+        <Shield v-if="Visible" />
+        <p class="text-nowrap">{{ user }}</p>
+        <User />
         <button @click="goToLogOut" variant="link">Выйти</button>
-        <LogOut @click="goToLogOut" />
+        <LogOut class="cursor-pointer" @click="goToLogOut" />
       </div>
     </div>
 
@@ -32,7 +34,7 @@
         </div>
       </ScrollArea>
       <div class="flex justify-center items-center">
-        <ScrollArea class="min-h-[500px] min-w-[200px] w-[1100px] rounded-md">
+        <ScrollArea v-if="isSearch !== 0" class="min-h-[500px] min-w-[200px] w-[1100px] rounded-md">
           <div class="flex flex-wrap gap-12 ml-10">
             <div
               v-for="item in queryItems"
@@ -53,12 +55,9 @@
               </p>
               <div class="flex items-center justify-between mt-10">
                 <div class="flex justify-center mt-5">
-                  <p class="text-gray-700 font-semibold absolute left-4 bottom-4">
-                    {{ item.price_components }} <span class="text-slate-600">руб</span>
-                  </p>
                   <div class="absolute bottom-2 right-2">
                     <RouterLink :to="{ path: `/cardPage/${item.id_components}` }">
-                      <Button class="bg-orange-400 w-32 text-white" variant="outline">
+                      <Button class="bg-orange-400 w-[245px] text-white" variant="outline">
                         Открыть
                       </Button></RouterLink
                     >
@@ -68,6 +67,16 @@
             </div>
           </div>
         </ScrollArea>
+      </div>
+      <div
+        class="flex items-center gap-5 flex-col ml-24 z-50 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+        v-if="isSearch > 0"
+      >
+        <Snail size="120px" class="" />
+        <p class="text-2xl cursor-default font-semibold">Ничего не найдено</p>
+        <p class="text-x text-orange-500 rounded-md cursor-default">
+          Очистите поиск и попробуйте снова
+        </p>
       </div>
     </div>
   </div>
@@ -85,8 +94,23 @@ import { Search } from 'lucide-vue-next'
 import { Input } from '@/components/ui/input'
 import { ShoppingCart, LogOut } from 'lucide-vue-next'
 import { useRoute, useRouter } from 'vue-router'
+import spinner from '@/components/custom/profile/spinner.vue'
+import { Snail } from 'lucide-vue-next'
+import { User } from 'lucide-vue-next'
+import { Shield } from 'lucide-vue-next'
 
 const router = useRouter()
+
+const user = ref(localStorage.full_name)
+
+let Visible = ref(false)
+
+const role = ref('')
+
+if (localStorage.role == 'Admin') {
+  Visible.value = true
+  role.value = 'Админ Панель'
+}
 
 const goToCart = () => {
   router.push('/cartPage')
@@ -97,19 +121,20 @@ const query = ref('')
 console.log(localStorage)
 
 const queryItems = computed(() => {
-  let item = items.value
-  let search = query.value
-  let cat = category.value
+  let search = query.value.toLowerCase().trim()
+  let filteredItems = items.value.filter((elem) => {
+    return (
+      elem.name_components.toLowerCase().includes(search) ||
+      elem.price_components.toString().includes(search)
+    )
+  })
 
-  if (search) {
-    item = item.filter((elem) => {
-      return (
-        elem.name_components.indexOf(search) !== -1 || elem.price_components.indexOf(search) !== -1
-      )
-    })
-  }
+  return filteredItems
+})
 
-  return item
+let isSearch = computed(() => {
+  console.log(queryItems.value.length)
+  return queryItems.value.length === 0
 })
 
 const goToLogOut = () => {

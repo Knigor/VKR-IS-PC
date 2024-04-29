@@ -10,13 +10,11 @@
         placeholder="Поиск по товару..."
         class="pl-10 min-w-96"
       />
-      {{ query }}
       <span class="absolute start-0 inset-y-2 flex px-2">
         <Search class="size-6 text-muted-foreground" />
       </span>
     </div>
     <div class="flex xl:mr-5 xl:ml-96 3xl:ml-90 intems-center gap-4">
-      <button variant="link">Корзина</button>
       <ShoppingCart />
       <button @click="goToLogOut" variant="link">Выйти</button>
       <LogOut @click="goToLogOut" />

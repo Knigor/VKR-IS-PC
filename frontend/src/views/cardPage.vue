@@ -5,6 +5,7 @@
       <div class="h-16 border-l border-orange-300"></div>
       <div class="relative w-full max-w-sm items-center">
         <Input
+          v-model="query"
           id="search"
           type="search"
           placeholder="Поиск по товару..."
@@ -15,76 +16,57 @@
           <Search class="size-6 text-muted-foreground" />
         </span>
       </div>
-      <div class="flex xl:mr-10 xl:ml-96 3xl:ml-90 intems-center gap-4">
-        <button @click="goToCart" variant="link">Корзина</button>
-        <ShoppingCart />
+      <div class="flex intems-center gap-2">
+        <p class="text-nowrap cursor-pointer">{{ role }}</p>
+        <Shield v-if="Visible" />
+        <p class="text-nowrap">{{ user }}</p>
+        <User />
         <button @click="goToLogOut" variant="link">Выйти</button>
-        <LogOut @click="goToLogOut" />
+        <LogOut class="cursor-pointer" @click="goToLogOut" />
       </div>
     </div>
 
-    <div class="flex mt-28 ml-5 mr-5 h-[400px] gap-20 justify-between border-2">
+    <div class="flex mt-28 ml-12 mr-5 h-[400px] gap-10 justify-between">
       <!-- Левый блок с описанием-->
-      <div class="h-[200px] w-[800px] ml-5 mt-5 bg-white flex flex-col">
-        <h1 class="font-bold">{{ element.name_components }}</h1>
-        <div class="flex mt-5 gap-12">
-          <img
-            class="border-gray-400 border-2"
-            :src="`/images/${element.img_components}`"
-            alt="Пусто"
-            style="width: 300px; height: 200px; object-fit: cover"
-          />
 
-          <div class="flex flex-col gap-2">
-            <p class="text-gray-400" v-for="property in propertyData" :key="property.id_property">
-              {{ property.value_property + ':' }}
-              <span class="text-black"> {{ property.key_property }} </span>
-            </p>
-          </div>
-
-          <div class="flex flex-col">
-            <Select>
-              <SelectTrigger class="text-orange max-w-[200px]">
-                <!-- добавлен класс max-w-[100px] -->
-                <SelectValue placeholder="Поставьте оценку" />
-              </SelectTrigger>
-              <SelectContent class="max-w-[200px]">
-                <!-- добавлен класс max-w-[100px] -->
-                <SelectGroup>
-                  <SelectLabel>Поставьте оценку</SelectLabel>
-                  <SelectItem value="one"> 1 </SelectItem>
-                  <SelectItem value="two"> 2 </SelectItem>
-                  <SelectItem value="three"> 3 </SelectItem>
-                  <SelectItem value="four"> 4 </SelectItem>
-                  <SelectItem value="five"> 5 </SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-            <Button class="mt-5"> Оставить оценку </Button>
+      <div class="ml-5 mt-5 bg-white flex flex-col items-center">
+        <div class="flex gap-24 justify-between items-center">
+          <div class="flex flex-col gap-4">
+            <h1 class="font-semibold text-x w-[330px]">{{ element.name_components }}</h1>
+            <img
+              class="border-gray-400"
+              :src="`/images/${element.img_components}`"
+              alt="Пусто"
+              style="width: 300px; height: 200px; object-fit: cover"
+            />
+            <div class="flex flex-col gap-2">
+              <p class="text-gray-400" v-for="property in propertyData" :key="property.id_property">
+                {{ property.value_property + ':' }}
+                <span class="text-black"> {{ property.key_property }} </span>
+              </p>
+            </div>
           </div>
         </div>
       </div>
-
-      <!-- Правый блок с корзиной-->
-      <div class="h-[200px] w-[200px] flex flex-col bg-white justify-center items-center">
-        <div class="flex flex-col gap-2">
-          <p>
-            {{ element.price_components }}
-            <span class="text-gray-400">руб</span>
-          </p>
-          <Button @click="addToCart">
-            <ShoppingCart color="" class="w-4 h-4 mr-2" /> В корзину
-          </Button>
-        </div>
-
-        <div class="flex gap-5 justify-center items-center mt-2">
-          <Button @click="countMinus" variant="outline" class="bg-white border-0 text-black"
-            >-</Button
-          >
-          <p>{{ count }}</p>
-          <Button @click="countPlus" variant="outline" class="bg-white border-0 text-black"
-            >+</Button
-          >
+      <div class="flex flex-col gap-6 mr-12 mt-5">
+        <h1 class="font-semibold text-xl">Оставьте отзыв</h1>
+        <div class="pl-1 flex flex-col gap-4">
+          <div class="grid w-full gap-1.5">
+            <Textarea
+              v-model="textReview"
+              id="message-2"
+              placeholder="Начните писать о своих впечатлениях..."
+            />
+            <p class="text-sm text-muted-foreground">
+              Ваша рецензия будет проверена модератором сервиса
+            </p>
+          </div>
+          <Toaster />
+          <div class="flex gap-8">
+            <router-link to="../ReviewsPage">
+              <Button @click="onsubmit">Отправить</Button>
+            </router-link>
+          </div>
         </div>
       </div>
     </div>
@@ -113,6 +95,21 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import ky from 'ky'
+import { useCartStore } from '@/stores/cartStore'
+import { User } from 'lucide-vue-next'
+import { Shield } from 'lucide-vue-next'
+import { Textarea } from '@/components/ui/textarea'
+
+const user = ref(localStorage.full_name)
+
+let Visible = ref(false)
+
+const role = ref('')
+
+if (localStorage.role == 'Admin') {
+  Visible.value = true
+  role.value = 'Админ Панель'
+}
 
 const router = useRouter()
 
@@ -146,11 +143,40 @@ const countMinus = () => {
   }
 }
 
+// Добавляем объект в корзину
+
+const cartStore = useCartStore()
+
+const addToCart = async () => {
+  try {
+    const response = await ky.get('http://localhost/getComponents.php').json()
+    cardData.value = response
+    // console.log(cardData.value)
+
+    // Ищем товар по нужному id и сохраняем в реактивную переменную element
+
+    const item = cardData.value.find((item) => item.id_components == idComponents) || null
+
+    element.value.id_components = item.id_components
+    element.value.id_score = item.id_score
+    element.value.img_components = item.img_components
+    element.value.name_category = item.name_category
+    element.value.name_components = item.name_components
+    element.value.price_components = item.price_components
+    element.value.stock = stock.value.quantity_stock
+
+    cartStore.addToCart(element.value, router)
+    // Массив для localStorage
+  } catch (error) {
+    console.error('Ошибка при загрузке данных:', error)
+  }
+}
+
 onMounted(async () => {
   try {
     const response = await ky.get('http://localhost/getComponents.php').json()
     cardData.value = response
-    console.log(cardData.value)
+    // console.log(cardData.value)
 
     // Ищем товар по нужному id и сохраняем в реактивную переменную element
 
@@ -194,12 +220,13 @@ onMounted(async () => {
     })
 
     stock.value = response.data
+    console.log(stock.value.quantity_stock)
   } catch (error) {
     console.error('Ошибка при отправке данных:', error)
   }
 })
 
-console.log(propertyData)
+// console.log(propertyData)
 
 const goToCart = () => {
   router.push('/cartPage')

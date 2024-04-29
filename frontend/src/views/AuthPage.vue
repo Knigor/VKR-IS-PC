@@ -10,7 +10,7 @@
             <FormItem>
               <FormLabel>Логин</FormLabel>
               <FormControl>
-                <Input type="text" placeholder="Введите ваше ФИО" v-bind="LoginField" />
+                <Input type="text" placeholder="Введите ваш логин" v-bind="LoginField" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -113,6 +113,7 @@ const onSubmit = handleSubmit(async (formData) => {
       localStorage.setItem('email', response.data.email)
       localStorage.setItem('id_user', response.data.id_user)
       localStorage.setItem('role', response.data.role)
+      localStorage.setItem('full_name', response.data.full_name)
       router.push('/mainPage')
     }
 

@@ -115,8 +115,6 @@ const onSubmit = handleSubmit(async (formData) => {
 
   console.log(userData)
 
-  // Пофиксить регистрацию
-
   apiFormData.append('login', userData.login)
   apiFormData.append('fio', userData.FIO)
   apiFormData.append('password', userData.password)
@@ -157,6 +155,7 @@ const onSubmit = handleSubmit(async (formData) => {
       localStorage.setItem('email', response.data.user.email)
       localStorage.setItem('id_user', response.data.user.id_user)
       localStorage.setItem('role', response.data.user.role_user)
+      localStorage.setItem('full_name', response.data.user.full_name_user)
       router.push('/mainPage')
     }
   } catch (error) {

@@ -23,23 +23,58 @@
       </div>
     </div>
 
-    <div class="flex mt-28 ml-5 mr-5 h-[400px] gap-20 justify-between border-2">
+    <div
+      v-if="isVisible == 'A'"
+      class="flex mt-16 ml-5 mb-12 mr-5 h-[400px] gap-20 justify-between"
+    >
       <!-- Левый блок с описанием-->
-      <div class="h-[200px] w-[800px] ml-5 mt-5 bg-white flex flex-col">
-        <h1 @click="goToBack" class="font-bold text-xl text-gray-400 cursor-pointer">
+      <div class="h-[200px] w-[800px] ml-5 mt-5 gap-6 bg-white flex flex-col">
+        <h1 @click="goToBack" class="font-bold text-xl w-[230px] text-gray-400 cursor-pointer">
           Вернуться к покупкам
         </h1>
-        <h1 class="font-bold text-2xl">Корзина</h1>
 
-        <div class="flex mt-5 gap-12">
+        <h1 class="font-bold text-2xl">Корзина</h1>
+        <p>{{ cartStore.carts[0] }}</p>
+
+        <div v-for="cart in cartStore.carts" :key="cart.id" class="flex mt-5 gap-12">
           <img
-            class="border-gray-400 border-2"
+            class="border-gray-400 h-[150px] w-[150px]"
+            :src="`/images/${cart.img_components}`"
             alt="Пусто"
-            style="width: 300px; height: 200px; object-fit: cover"
           />
 
           <div class="flex flex-col">
-            <p>Оперативная память</p>
+            <p>
+              {{ cart.name_components }}
+            </p>
+          </div>
+          <div>
+            <div class="flex gap-5 justify-center mt-2">
+              <Button
+                @click="() => countMinus(cart)"
+                variant="outline"
+                class="bg-white border-0 text-black"
+                >-</Button
+              >
+              <p class="flex pt-2">{{ cart.countPlus }}</p>
+
+              <Button
+                @click="() => countPlus(cart)"
+                variant="outline"
+                class="bg-white border-0 text-black"
+                >+</Button
+              >
+              <div class="pt-2">
+                <CircleX
+                  @click="cartStore.deleteCart(cart.id_components)"
+                  size="20px"
+                  class="cursor-pointer"
+                />
+              </div>
+            </div>
+            <p class="flex gap-2 items-center ml-4 mt-2">
+              {{ cart.price_components }} <span class="text-gray-400">руб</span>
+            </p>
           </div>
         </div>
       </div>
@@ -48,23 +83,41 @@
       <div class="h-[200px] w-[200px] flex flex-col bg-white justify-center items-center">
         <div class="flex flex-col gap-2">
           <p>
-            6000
+            {{ totalAmount }}
             <span class="text-gray-400">руб</span>
           </p>
-          <Button> Сделать заказ </Button>
-        </div>
 
-        <div class="flex gap-5 justify-center items-center mt-2">
-          <Button @click="countMinus" variant="outline" class="bg-white border-0 text-black"
-            >-</Button
-          >
-          <p>1</p>
-          <Button @click="countPlus" variant="outline" class="bg-white border-0 text-black"
-            >+</Button
-          >
+          <Sheet>
+            <SheetTrigger as-child>
+              <Button> Сделать заказ </Button>
+            </SheetTrigger>
+            <SheetContent>
+              <SheetHeader>
+                <SheetTitle>Введите номер телефона</SheetTitle>
+                <SheetDescription>
+                  Ваш номер телефона нужен для того, чтобы в дальнейшем с вами связался
+                  администратор магазина
+                </SheetDescription>
+              </SheetHeader>
+              <div class="grid gap-4 py-4">
+                <div class="flex w-full max-w-sm items-center gap-1.5">
+                  <Input id="phone" type="phone" placeholder="+7 (800)-555-35-35" />
+                </div>
+              </div>
+              <SheetFooter>
+                <SheetClose as-child>
+                  <Button @click="getOrder" type="submit"> Сделать заказ </Button>
+                </SheetClose>
+              </SheetFooter>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
+
+      <Toaster />
     </div>
+    <div v-else-if="isVisible == 'B'">Корзина пуста, добавьте как минимум один товар</div>
+    <div v-else-if="isVisible == 'C'">Ваш заказ оформлен</div>
   </div>
 </template>
 
@@ -89,10 +142,70 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
+import { CircleX } from 'lucide-vue-next'
+import { Label } from '@/components/ui/label'
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger
+} from '@/components/ui/sheet'
+import Toaster from '@/components/ui/toast/Toaster.vue'
+import { useToast } from '@/components/ui/toast/use-toast'
+
+import { useCartStore } from '@/stores/cartStore'
 
 const router = useRouter()
+const cartStore = useCartStore()
+
+const { toast } = useToast()
+
+let isVisible = ref('A')
+
+console.log(cartStore.carts.length)
+
+const getOrder = () => {
+  try {
+    console.log('Клик')
+
+    if (cartStore.carts.length == 0) {
+      isVisible.value = 'B'
+    } else {
+      cartStore.clearCart()
+      isVisible.value = 'C'
+    }
+  } catch (error) {
+    console.log(error.message)
+  }
+}
+
+// console.log(cartStore.carts[0].price_components)
+
+const countPlus = (cartItem) => {
+  if (cartItem.countPlus < cartItem.stock) {
+    cartItem.countPlus++
+  }
+}
+
+const countMinus = (cartItem) => {
+  if (cartItem.countPlus > 1) {
+    cartItem.countPlus--
+  }
+}
+
+const totalAmount = computed(() => {
+  return cartStore.carts.reduce((total, cartItem) => {
+    const itemTotal = cartItem.price_components * cartItem.countPlus
+    return total + itemTotal
+  }, 0)
+})
 
 const goToBack = () => {
+  localStorage.setItem('pageReloaded', false)
   router.push('/MainPage')
 }
 
@@ -101,7 +214,9 @@ const goToLogOut = () => {
   router.push('/')
 }
 
-console.log(localStorage)
+const goToOrder = () => {
+  router.push('/orderPage')
+}
 </script>
 
 <style lang="scss" scoped></style>

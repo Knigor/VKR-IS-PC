@@ -69,7 +69,6 @@ $data['id_user'] = $id_user;
 
 // Запись данных в файл (для отладки)
 $userDataString = json_encode(array('status' => 'success', 'user' => $data));
-file_put_contents('dataa.txt', $userDataString . PHP_EOL, FILE_APPEND);
 
 // Формирование и отправка JSON-ответа
 header('Content-Type: application/json');
