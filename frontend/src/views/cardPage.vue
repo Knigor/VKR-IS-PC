@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col">
+  <div class="flex flex-col gap-36">
     <div class="flex items-center gap-10 mt-5 ml-5">
       <siteLogo></siteLogo>
       <div class="h-16 border-l border-orange-300"></div>
@@ -17,29 +17,38 @@
         </span>
       </div>
       <div class="flex intems-center gap-2">
-        <p class="text-nowrap cursor-pointer">{{ role }}</p>
-        <Shield v-if="Visible" />
-        <p class="text-nowrap">{{ user }}</p>
-        <User />
-        <button @click="goToLogOut" variant="link">Выйти</button>
-        <LogOut class="cursor-pointer" @click="goToLogOut" />
+        <div v-if="logVisible" class="flex gap-2">
+          <p @click="goToAdminPanel" class="text-nowrap cursor-pointer">{{ role }}</p>
+          <Shield @click="goToAdminPanel" v-if="Visible" />
+          <p class="text-nowrap">{{ user }}</p>
+          <User v-if="userVisible" />
+          <button @click="goToLogOut" variant="link">Выйти</button>
+          <LogOut class="cursor-pointer" @click="goToLogOut" />
+        </div>
+        <div v-else class="flex gap-2 ml-[130px]">
+          <button @click="goToLogIn" variant="link">Войти</button>
+          <LogIn class="cursor-pointer" @click="goToLogIn" />
+        </div>
       </div>
     </div>
 
-    <div class="flex mt-28 ml-12 mr-5 h-[400px] gap-10 justify-between">
+    <div class="flex ml-12 mr-5 h-[400px] gap-10 justify-between">
       <!-- Левый блок с описанием-->
 
       <div class="ml-5 mt-5 bg-white flex flex-col items-center">
         <div class="flex gap-24 justify-between items-center">
           <div class="flex flex-col gap-4">
-            <h1 class="font-semibold text-x w-[330px]">{{ element.name_components }}</h1>
+            <div>
+              <Button @click="backToMain" variant="link" class="ml-[-15px]">Назад</Button>
+              <h1 class="font-semibold text-x max-w-[730px]">{{ element.name_components }}</h1>
+            </div>
             <img
               class="border-gray-400"
               :src="`/images/${element.img_components}`"
               alt="Пусто"
-              style="width: 300px; height: 200px; object-fit: cover"
+              style="max-width: 400px; max-height: 250px; object-fit: cover"
             />
-            <div class="flex flex-col gap-2">
+            <div class="flex flex-col gap-2 max-w-[430px]">
               <p class="text-gray-400" v-for="property in propertyData" :key="property.id_property">
                 {{ property.value_property + ':' }}
                 <span class="text-black"> {{ property.key_property }} </span>
@@ -48,24 +57,52 @@
           </div>
         </div>
       </div>
-      <div class="flex flex-col gap-6 mr-12 mt-5">
+
+      <!-- Правый блок с отзывами-->
+      <div v-if="reviewVisible" class="flex flex-col gap-6 mr-12 mt-16">
         <h1 class="font-semibold text-xl">Оставьте отзыв</h1>
         <div class="pl-1 flex flex-col gap-4">
           <div class="grid w-full gap-1.5">
-            <Textarea
-              v-model="textReview"
-              id="message-2"
-              placeholder="Начните писать о своих впечатлениях..."
-            />
+            <Textarea v-model="textReview" placeholder="Начните писать о своих впечатлениях..." />
             <p class="text-sm text-muted-foreground">
               Ваша рецензия будет проверена модератором сервиса
             </p>
           </div>
           <Toaster />
           <div class="flex gap-8">
-            <router-link to="../ReviewsPage">
-              <Button @click="onsubmit">Отправить</Button>
-            </router-link>
+            <Button @click="pushReview">Отправить</Button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Комментарии-->
+
+    <div class="max-w-3xl ml-8">
+      <h1 class="text-bold text-2xl m-4">Комментарии</h1>
+      <div
+        v-for="review in reviews"
+        :key="review.id_score"
+        class="m-4 block rounded-lg bg-white p-6 shadow-lg dark:bg-neutral-800 dark:shadow-black/20"
+      >
+        <!--Testimonial-->
+        <div>
+          <div class="md:flex md:flex-row">
+            <div class="mx-auto mb-6 flex w-36 items-center justify-center md:mx-0 md:w-96 lg:mb-0">
+              <img
+                src="https://api.dicebear.com/8.x/pixel-art/svg?backgroundColor=b6e3f4"
+                class="rounded-full shadow-md dark:shadow-black/30"
+                alt="woman avatar"
+              />
+            </div>
+            <div class="md:ms-6">
+              <p class="mb-6 font-light text-neutral-500 dark:text-neutral-300">
+                {{ review.text_review }}
+              </p>
+              <p class="mb-2 text-xl font-semibold text-neutral-800 dark:text-neutral-200">
+                {{ review.fio }}
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -74,6 +111,8 @@
 </template>
 
 <script setup>
+import { createAvatar } from '@dicebear/core'
+import { pixelArt } from '@dicebear/collection'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Cpu } from 'lucide-vue-next'
 import { AspectRatio } from '@/components/ui/aspect-ratio'
@@ -99,8 +138,14 @@ import { useCartStore } from '@/stores/cartStore'
 import { User } from 'lucide-vue-next'
 import { Shield } from 'lucide-vue-next'
 import { Textarea } from '@/components/ui/textarea'
+import { LogIn } from 'lucide-vue-next'
+import { formatDate } from '@vueuse/core'
+import { Toaster } from '@/components/ui/toast'
+import { useToast } from '@/components/ui/toast/use-toast'
 
 const user = ref(localStorage.full_name)
+
+const { toast } = useToast()
 
 let Visible = ref(false)
 
@@ -111,6 +156,47 @@ if (localStorage.role == 'Admin') {
   role.value = 'Админ Панель'
 }
 
+let userVisible = ref(false)
+let logVisible = ref()
+
+// Логика с аватарками
+
+const avatar = createAvatar(pixelArt, {
+  seed: 'Felix'
+})
+
+const svg = avatar.toString()
+
+if (localStorage.length == 0) {
+  logVisible.value = false
+} else {
+  logVisible.value = true
+  userVisible.value = true
+}
+
+let outText = ref()
+
+const backToMain = () => {
+  router.push('/')
+}
+
+const goToAdminPanel = () => {
+  router.push('/mainAdmin')
+}
+
+const goToLogIn = () => {
+  console.log('Клик Войти')
+  logVisible.value = true
+  router.push('/authPage')
+}
+
+const goToLogOut = () => {
+  localStorage.clear()
+  console.log('Клик, Выйти')
+  logVisible.value = false
+  router.push('/')
+}
+
 const router = useRouter()
 
 const getIdComponent = useRoute()
@@ -118,6 +204,9 @@ const getIdComponent = useRoute()
 const cardData = ref([])
 
 const propertyData = ref([])
+const reviews = ref([])
+
+console.log(reviews)
 
 const idComponents = getIdComponent.params.id
 
@@ -125,23 +214,21 @@ let element = ref({})
 
 // Здесь будет логика на счетчик
 
-let count = ref(1)
-
 let stock = ref({})
 
-const countPlus = () => {
-  if (count.value < stock.value.quantity_stock) {
-    count.value++
-    console.log((element.value.price_components *= 2))
-  }
+let reviewVisible = ref(false)
+
+if (localStorage.length == 0) {
+  reviewVisible.value = false
+} else {
+  reviewVisible.value = true
 }
 
-const countMinus = () => {
-  if (count.value > 1) {
-    count.value--
-    element.value.price_components /= 2
-  }
-}
+console.log(localStorage)
+
+// делаем запрос
+
+let textReview = ref('')
 
 // Добавляем объект в корзину
 
@@ -169,6 +256,33 @@ const addToCart = async () => {
     // Массив для localStorage
   } catch (error) {
     console.error('Ошибка при загрузке данных:', error)
+  }
+}
+
+const pushReview = async () => {
+  // Оставить отзыв
+  const reviewFormData = new FormData()
+
+  reviewFormData.append('id_user', localStorage.id_user)
+  reviewFormData.append('id_components', getIdComponent.params.id)
+  reviewFormData.append('text_review', textReview.value)
+
+  try {
+    const response = await axios.post('http://localhost/postAddReviews.php', reviewFormData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+
+    if (response.data.status == 'Success') {
+      toast({
+        description: 'Ваш отзыв отправлен на модерацию'
+      })
+      textReview.value = ''
+    }
+    console.log(response.data)
+  } catch (error) {
+    console.error('Ошибка при отправке данных:', error)
   }
 }
 
@@ -210,31 +324,24 @@ onMounted(async () => {
     console.error('Ошибка при отправке данных:', error)
   }
 
-  // Получаем кол-во товара на складе
+  // Получаем отзывы
 
   try {
-    const response = await axios.post('http://localhost/postStockAPI.php', apiFormData, {
+    const response = await axios.post('http://localhost/getReview.php', apiFormData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
     })
 
-    stock.value = response.data
-    console.log(stock.value.quantity_stock)
+    console.log(response.data)
+    reviews.value = response.data
   } catch (error) {
     console.error('Ошибка при отправке данных:', error)
   }
 })
 
-// console.log(propertyData)
-
 const goToCart = () => {
   router.push('/cartPage')
-}
-
-const goToLogOut = () => {
-  localStorage.clear()
-  router.push('/')
 }
 </script>
 

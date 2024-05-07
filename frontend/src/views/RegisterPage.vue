@@ -80,7 +80,7 @@ import axios from 'axios'
 const router = useRouter()
 
 const gotToLogin = () => {
-  router.push('/')
+  router.push('/authPage')
 }
 
 // Сделать логику для регистрации
@@ -156,7 +156,7 @@ const onSubmit = handleSubmit(async (formData) => {
       localStorage.setItem('id_user', response.data.user.id_user)
       localStorage.setItem('role', response.data.user.role_user)
       localStorage.setItem('full_name', response.data.user.full_name_user)
-      router.push('/mainPage')
+      router.push('/')
     }
   } catch (error) {
     console.error('Ошибка при отправке данных:', error)

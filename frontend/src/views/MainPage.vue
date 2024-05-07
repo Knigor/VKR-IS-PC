@@ -17,12 +17,18 @@
         </span>
       </div>
       <div class="flex intems-center gap-2">
-        <p class="text-nowrap cursor-pointer">{{ role }}</p>
-        <Shield v-if="Visible" />
-        <p class="text-nowrap">{{ user }}</p>
-        <User />
-        <button @click="goToLogOut" variant="link">Выйти</button>
-        <LogOut class="cursor-pointer" @click="goToLogOut" />
+        <div v-if="logVisible" class="flex gap-2">
+          <p @click="goToAdminPanel" class="text-nowrap cursor-pointer">{{ role }}</p>
+          <Shield @click="goToAdminPanel" v-if="Visible" />
+          <p class="text-nowrap">{{ user }}</p>
+          <User v-if="userVisible" />
+          <button @click="goToLogOut" variant="link">Выйти</button>
+          <LogOut class="cursor-pointer" @click="goToLogOut" />
+        </div>
+        <div v-else class="flex gap-2 ml-[130px]">
+          <button @click="goToLogIn" variant="link">Войти</button>
+          <LogIn class="cursor-pointer" @click="goToLogIn" />
+        </div>
       </div>
     </div>
 
@@ -98,8 +104,13 @@ import spinner from '@/components/custom/profile/spinner.vue'
 import { Snail } from 'lucide-vue-next'
 import { User } from 'lucide-vue-next'
 import { Shield } from 'lucide-vue-next'
+import { LogIn } from 'lucide-vue-next'
 
 const router = useRouter()
+
+const goToAdminPanel = () => {
+  router.push('/mainAdmin')
+}
 
 const user = ref(localStorage.full_name)
 
@@ -118,7 +129,31 @@ const goToCart = () => {
 
 const query = ref('')
 
-console.log(localStorage)
+let userVisible = ref(false)
+let logVisible = ref()
+
+if (localStorage.length == 0) {
+  logVisible.value = false
+} else {
+  logVisible.value = true
+  userVisible.value = true
+}
+
+let outText = ref()
+
+const goToLogIn = () => {
+  console.log('Клик Войти')
+  logVisible.value = true
+  router.push('/authPage')
+}
+
+const goToLogOut = () => {
+  localStorage.clear()
+  console.log('Клик, Выйти')
+  logVisible.value = false
+}
+
+console.log(localStorage.length)
 
 const queryItems = computed(() => {
   let search = query.value.toLowerCase().trim()
@@ -133,14 +168,8 @@ const queryItems = computed(() => {
 })
 
 let isSearch = computed(() => {
-  console.log(queryItems.value.length)
   return queryItems.value.length === 0
 })
-
-const goToLogOut = () => {
-  localStorage.clear()
-  router.push('/')
-}
 
 const items = ref([])
 

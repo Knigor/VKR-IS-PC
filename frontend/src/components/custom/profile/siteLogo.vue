@@ -6,7 +6,7 @@ const router = useRouter()
 
 const goToMainPage = () => {
   console.log('Клик')
-  router.push('/mainPage')
+  router.push('/')
 }
 
 defineProps({

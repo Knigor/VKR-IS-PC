@@ -55,41 +55,6 @@ ALTER SEQUENCE public.category_product_id_catergory_seq OWNED BY public.category
 
 
 --
--- Name: components_stock; Type: TABLE; Schema: public; Owner: user
---
-
-CREATE TABLE public.components_stock (
-    stock_id integer NOT NULL,
-    id_components integer,
-    quantity_stock integer NOT NULL
-);
-
-
-ALTER TABLE public.components_stock OWNER TO "user";
-
---
--- Name: components_stock_stock_id_seq; Type: SEQUENCE; Schema: public; Owner: user
---
-
-CREATE SEQUENCE public.components_stock_stock_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.components_stock_stock_id_seq OWNER TO "user";
-
---
--- Name: components_stock_stock_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: user
---
-
-ALTER SEQUENCE public.components_stock_stock_id_seq OWNED BY public.components_stock.stock_id;
-
-
---
 -- Name: componets; Type: TABLE; Schema: public; Owner: user
 --
 
@@ -97,7 +62,8 @@ CREATE TABLE public.componets (
     id_components integer NOT NULL,
     name_components character varying(100) NOT NULL,
     price_components character varying(200) NOT NULL,
-    img_components character varying(200) NOT NULL
+    img_components character varying(200) NOT NULL,
+    id_score integer
 );
 
 
@@ -123,45 +89,6 @@ ALTER TABLE public.componets_id_components_seq OWNER TO "user";
 --
 
 ALTER SEQUENCE public.componets_id_components_seq OWNED BY public.componets.id_components;
-
-
---
--- Name: order; Type: TABLE; Schema: public; Owner: user
---
-
-CREATE TABLE public."order" (
-    id_order integer NOT NULL,
-    id_user integer NOT NULL,
-    id_components integer,
-    date_order date NOT NULL,
-    status_order character varying(50) NOT NULL,
-    phone character varying(40) NOT NULL,
-    quantity integer
-);
-
-
-ALTER TABLE public."order" OWNER TO "user";
-
---
--- Name: order_id_order_seq; Type: SEQUENCE; Schema: public; Owner: user
---
-
-CREATE SEQUENCE public.order_id_order_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.order_id_order_seq OWNER TO "user";
-
---
--- Name: order_id_order_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: user
---
-
-ALTER SEQUENCE public.order_id_order_seq OWNED BY public."order".id_order;
 
 
 --
@@ -200,24 +127,23 @@ ALTER SEQUENCE public.property_components_id_property_seq OWNED BY public.proper
 
 
 --
--- Name: rating; Type: TABLE; Schema: public; Owner: user
+-- Name: review; Type: TABLE; Schema: public; Owner: user
 --
 
-CREATE TABLE public.rating (
+CREATE TABLE public.review (
     id_score integer NOT NULL,
     id_user integer NOT NULL,
-    id_components integer,
-    score integer NOT NULL
+    text_review text NOT NULL
 );
 
 
-ALTER TABLE public.rating OWNER TO "user";
+ALTER TABLE public.review OWNER TO "user";
 
 --
--- Name: rating_id_score_seq; Type: SEQUENCE; Schema: public; Owner: user
+-- Name: review_id_score_seq; Type: SEQUENCE; Schema: public; Owner: user
 --
 
-CREATE SEQUENCE public.rating_id_score_seq
+CREATE SEQUENCE public.review_id_score_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -226,13 +152,13 @@ CREATE SEQUENCE public.rating_id_score_seq
     CACHE 1;
 
 
-ALTER TABLE public.rating_id_score_seq OWNER TO "user";
+ALTER TABLE public.review_id_score_seq OWNER TO "user";
 
 --
--- Name: rating_id_score_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: user
+-- Name: review_id_score_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: user
 --
 
-ALTER SEQUENCE public.rating_id_score_seq OWNED BY public.rating.id_score;
+ALTER SEQUENCE public.review_id_score_seq OWNED BY public.review.id_score;
 
 
 --
@@ -305,24 +231,10 @@ ALTER TABLE ONLY public.category_product ALTER COLUMN id_catergory SET DEFAULT n
 
 
 --
--- Name: components_stock stock_id; Type: DEFAULT; Schema: public; Owner: user
---
-
-ALTER TABLE ONLY public.components_stock ALTER COLUMN stock_id SET DEFAULT nextval('public.components_stock_stock_id_seq'::regclass);
-
-
---
 -- Name: componets id_components; Type: DEFAULT; Schema: public; Owner: user
 --
 
 ALTER TABLE ONLY public.componets ALTER COLUMN id_components SET DEFAULT nextval('public.componets_id_components_seq'::regclass);
-
-
---
--- Name: order id_order; Type: DEFAULT; Schema: public; Owner: user
---
-
-ALTER TABLE ONLY public."order" ALTER COLUMN id_order SET DEFAULT nextval('public.order_id_order_seq'::regclass);
 
 
 --
@@ -333,10 +245,10 @@ ALTER TABLE ONLY public.property_components ALTER COLUMN id_property SET DEFAULT
 
 
 --
--- Name: rating id_score; Type: DEFAULT; Schema: public; Owner: user
+-- Name: review id_score; Type: DEFAULT; Schema: public; Owner: user
 --
 
-ALTER TABLE ONLY public.rating ALTER COLUMN id_score SET DEFAULT nextval('public.rating_id_score_seq'::regclass);
+ALTER TABLE ONLY public.review ALTER COLUMN id_score SET DEFAULT nextval('public.review_id_score_seq'::regclass);
 
 
 --
@@ -359,46 +271,27 @@ COPY public.category_product (id_catergory, name_category) FROM stdin;
 
 
 --
--- Data for Name: components_stock; Type: TABLE DATA; Schema: public; Owner: user
---
-
-COPY public.components_stock (stock_id, id_components, quantity_stock) FROM stdin;
-1	1	5
-2	7	9
-\.
-
-
---
 -- Data for Name: componets; Type: TABLE DATA; Schema: public; Owner: user
 --
 
-COPY public.componets (id_components, name_components, price_components, img_components) FROM stdin;
-3	Оперативная память Kingston Fury Beast KF432C16BB1K2/32 DDR4 - 2x 16ГБ 3200МГц, DIMM, Ret	10990	memory2.jpg
-1	Оперативная память Kingston Fury Beast Black KF432C16BBK2/16 DDR4 - 2x 8ГБ 3200МГц, DIMM, Ret	5990	memory.jpg
-4	Оперативная память Patriot Signature PSD48G266681 DDR4 - 1x 8ГБ 2666МГц, DIMM, Ret	2090	memory3.jpg
-5	Оперативная память Patriot Viper Elite II PVE2432G400C0K DDR4 - 2x 16ГБ 4000МГц, DIMM, Ret	9990	memory4.jpg
-7	Материнская плата MSI PRO H610M-E DDR4, LGA 1700, Intel H610, mATX, Ret	8670	matherboard1.jpg
-8	Материнская плата ASUS PRIME B650-PLUS, SocketAM5, AMD B650, ATX, Ret	22610	matherboard2.jpg
-9	Материнская плата MSI A520M-A PRO, SocketAM4, AMD A520, mATX, Ret	7220	matherboard3.jpg
-11	Материнская плата MSI MPG B550 GAMING PLUS, SocketAM4, AMD B550, ATX, Ret	16890	matherboard4.jpg
-12	Видеокарта Palit NVIDIA GeForce RTX 4080 Super RTX4080 SUPER GAMINGPRO 16ГБ GamingPro, GDDR6X, Ret 	147500	videocard.jpg
-13	Видеокарта ASUS NVIDIA GeForce RTX 3050 DUAL-RTX3050-O6G 6ГБ Dual, GDDR6, OC, Ret	24900	videocard1.jpg
-14	Видеокарта Palit NVIDIA GeForce RTX 3060 PA-RTX3060 DUAL 12G 12ГБ Dual, GDDR6, LHR, Ret	38500	videocard2.jpg
-15	Видеокарта GIGABYTE NVIDIA GeForce RTX 3060 GV-N3060GAMING OC-12GD 2.0 LHR 12ГБ GDDR6, OC, LHR, Ret	44100	videocard3.jpg
-16	Процессор Intel Core i5 12400F, LGA 1700, OEM [cm8071504650609 srl5z]	14490	cpu1.jpg
-17	Процессор AMD Ryzen 3 2200G, AM4, OEM [yd2200c5m4mfb]	7490	cpu2.jpg
-6	Оперативная память Kingston Fury Beast Black KF432C16BBK2/32 DDR4 - 2x 16ГБ 3200МГц, DIMM, Ret	9880	memory4.jpg
-19	Процессор AMD Ryzen 5 5600, AM4, OEM [100-000000927]	13190	cpu3.jpg
-18	Процессор AMD Ryzen 5 5600, AM4, BOX [100-100000927cbx]	15990	cpu3.jpg
-\.
-
-
---
--- Data for Name: order; Type: TABLE DATA; Schema: public; Owner: user
---
-
-COPY public."order" (id_order, id_user, id_components, date_order, status_order, phone, quantity) FROM stdin;
-1	1	1	2024-04-04	В процессе	88005553535	2
+COPY public.componets (id_components, name_components, price_components, img_components, id_score) FROM stdin;
+3	Оперативная память Kingston Fury Beast KF432C16BB1K2/32 DDR4 - 2x 16ГБ 3200МГц, DIMM, Ret	10990	memory2.jpg	\N
+1	Оперативная память Kingston Fury Beast Black KF432C16BBK2/16 DDR4 - 2x 8ГБ 3200МГц, DIMM, Ret	5990	memory.jpg	\N
+4	Оперативная память Patriot Signature PSD48G266681 DDR4 - 1x 8ГБ 2666МГц, DIMM, Ret	2090	memory3.jpg	\N
+5	Оперативная память Patriot Viper Elite II PVE2432G400C0K DDR4 - 2x 16ГБ 4000МГц, DIMM, Ret	9990	memory4.jpg	\N
+7	Материнская плата MSI PRO H610M-E DDR4, LGA 1700, Intel H610, mATX, Ret	8670	matherboard1.jpg	\N
+8	Материнская плата ASUS PRIME B650-PLUS, SocketAM5, AMD B650, ATX, Ret	22610	matherboard2.jpg	\N
+9	Материнская плата MSI A520M-A PRO, SocketAM4, AMD A520, mATX, Ret	7220	matherboard3.jpg	\N
+11	Материнская плата MSI MPG B550 GAMING PLUS, SocketAM4, AMD B550, ATX, Ret	16890	matherboard4.jpg	\N
+12	Видеокарта Palit NVIDIA GeForce RTX 4080 Super RTX4080 SUPER GAMINGPRO 16ГБ GamingPro, GDDR6X, Ret 	147500	videocard.jpg	\N
+13	Видеокарта ASUS NVIDIA GeForce RTX 3050 DUAL-RTX3050-O6G 6ГБ Dual, GDDR6, OC, Ret	24900	videocard1.jpg	\N
+14	Видеокарта Palit NVIDIA GeForce RTX 3060 PA-RTX3060 DUAL 12G 12ГБ Dual, GDDR6, LHR, Ret	38500	videocard2.jpg	\N
+15	Видеокарта GIGABYTE NVIDIA GeForce RTX 3060 GV-N3060GAMING OC-12GD 2.0 LHR 12ГБ GDDR6, OC, LHR, Ret	44100	videocard3.jpg	\N
+16	Процессор Intel Core i5 12400F, LGA 1700, OEM [cm8071504650609 srl5z]	14490	cpu1.jpg	\N
+17	Процессор AMD Ryzen 3 2200G, AM4, OEM [yd2200c5m4mfb]	7490	cpu2.jpg	\N
+6	Оперативная память Kingston Fury Beast Black KF432C16BBK2/32 DDR4 - 2x 16ГБ 3200МГц, DIMM, Ret	9880	memory4.jpg	\N
+19	Процессор AMD Ryzen 5 5600, AM4, OEM [100-000000927]	13190	cpu3.jpg	\N
+18	Процессор AMD Ryzen 5 5600, AM4, BOX [100-100000927cbx]	15990	cpu3.jpg	\N
 \.
 
 
@@ -420,11 +313,11 @@ COPY public.property_components (id_property, value_property, key_property) FROM
 
 
 --
--- Data for Name: rating; Type: TABLE DATA; Schema: public; Owner: user
+-- Data for Name: review; Type: TABLE DATA; Schema: public; Owner: user
 --
 
-COPY public.rating (id_score, id_user, id_components, score) FROM stdin;
-1	11	1	4
+COPY public.review (id_score, id_user, text_review) FROM stdin;
+1	1	Абоба
 \.
 
 
@@ -491,24 +384,10 @@ SELECT pg_catalog.setval('public.category_product_id_catergory_seq', 4, true);
 
 
 --
--- Name: components_stock_stock_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
---
-
-SELECT pg_catalog.setval('public.components_stock_stock_id_seq', 2, true);
-
-
---
 -- Name: componets_id_components_seq; Type: SEQUENCE SET; Schema: public; Owner: user
 --
 
 SELECT pg_catalog.setval('public.componets_id_components_seq', 19, true);
-
-
---
--- Name: order_id_order_seq; Type: SEQUENCE SET; Schema: public; Owner: user
---
-
-SELECT pg_catalog.setval('public.order_id_order_seq', 1, true);
 
 
 --
@@ -519,10 +398,10 @@ SELECT pg_catalog.setval('public.property_components_id_property_seq', 18, true)
 
 
 --
--- Name: rating_id_score_seq; Type: SEQUENCE SET; Schema: public; Owner: user
+-- Name: review_id_score_seq; Type: SEQUENCE SET; Schema: public; Owner: user
 --
 
-SELECT pg_catalog.setval('public.rating_id_score_seq', 1, true);
+SELECT pg_catalog.setval('public.review_id_score_seq', 1, true);
 
 
 --
@@ -541,27 +420,11 @@ ALTER TABLE ONLY public.category_product
 
 
 --
--- Name: components_stock pk_components_stock; Type: CONSTRAINT; Schema: public; Owner: user
---
-
-ALTER TABLE ONLY public.components_stock
-    ADD CONSTRAINT pk_components_stock PRIMARY KEY (stock_id);
-
-
---
 -- Name: componets pk_componets; Type: CONSTRAINT; Schema: public; Owner: user
 --
 
 ALTER TABLE ONLY public.componets
     ADD CONSTRAINT pk_componets PRIMARY KEY (id_components);
-
-
---
--- Name: order pk_order; Type: CONSTRAINT; Schema: public; Owner: user
---
-
-ALTER TABLE ONLY public."order"
-    ADD CONSTRAINT pk_order PRIMARY KEY (id_order);
 
 
 --
@@ -573,11 +436,11 @@ ALTER TABLE ONLY public.property_components
 
 
 --
--- Name: rating pk_rating; Type: CONSTRAINT; Schema: public; Owner: user
+-- Name: review pk_review; Type: CONSTRAINT; Schema: public; Owner: user
 --
 
-ALTER TABLE ONLY public.rating
-    ADD CONSTRAINT pk_rating PRIMARY KEY (id_score);
+ALTER TABLE ONLY public.review
+    ADD CONSTRAINT pk_review PRIMARY KEY (id_score);
 
 
 --
@@ -612,31 +475,10 @@ CREATE UNIQUE INDEX category_product_pk ON public.category_product USING btree (
 
 
 --
--- Name: components_stock_pk; Type: INDEX; Schema: public; Owner: user
---
-
-CREATE UNIQUE INDEX components_stock_pk ON public.components_stock USING btree (stock_id);
-
-
---
 -- Name: componets_pk; Type: INDEX; Schema: public; Owner: user
 --
 
 CREATE UNIQUE INDEX componets_pk ON public.componets USING btree (id_components);
-
-
---
--- Name: makes_order_fk; Type: INDEX; Schema: public; Owner: user
---
-
-CREATE INDEX makes_order_fk ON public."order" USING btree (id_user);
-
-
---
--- Name: order_pk; Type: INDEX; Schema: public; Owner: user
---
-
-CREATE UNIQUE INDEX order_pk ON public."order" USING btree (id_order);
 
 
 --
@@ -650,14 +492,14 @@ CREATE UNIQUE INDEX property_components_pk ON public.property_components USING b
 -- Name: puts_score_fk; Type: INDEX; Schema: public; Owner: user
 --
 
-CREATE INDEX puts_score_fk ON public.rating USING btree (id_user);
+CREATE INDEX puts_score_fk ON public.review USING btree (id_user);
 
 
 --
 -- Name: rating_pk; Type: INDEX; Schema: public; Owner: user
 --
 
-CREATE UNIQUE INDEX rating_pk ON public.rating USING btree (id_score);
+CREATE UNIQUE INDEX rating_pk ON public.review USING btree (id_score);
 
 
 --
@@ -703,20 +545,6 @@ CREATE UNIQUE INDEX stores_property_pk ON public.stores_property USING btree (id
 
 
 --
--- Name: stores_rating_fk; Type: INDEX; Schema: public; Owner: user
---
-
-CREATE INDEX stores_rating_fk ON public.rating USING btree (id_components);
-
-
---
--- Name: stores_stock_fk; Type: INDEX; Schema: public; Owner: user
---
-
-CREATE INDEX stores_stock_fk ON public.components_stock USING btree (id_components);
-
-
---
 -- Name: users_pk; Type: INDEX; Schema: public; Owner: user
 --
 
@@ -724,43 +552,19 @@ CREATE UNIQUE INDEX users_pk ON public.users USING btree (id_user);
 
 
 --
--- Name: components_stock fk_componen_stores_st_componet; Type: FK CONSTRAINT; Schema: public; Owner: user
+-- Name: componets fk_componet_stores_re_review; Type: FK CONSTRAINT; Schema: public; Owner: user
 --
 
-ALTER TABLE ONLY public.components_stock
-    ADD CONSTRAINT fk_componen_stores_st_componet FOREIGN KEY (id_components) REFERENCES public.componets(id_components) ON UPDATE RESTRICT ON DELETE RESTRICT;
-
-
---
--- Name: order fk_order_makes_ord_users; Type: FK CONSTRAINT; Schema: public; Owner: user
---
-
-ALTER TABLE ONLY public."order"
-    ADD CONSTRAINT fk_order_makes_ord_users FOREIGN KEY (id_user) REFERENCES public.users(id_user) ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE ONLY public.componets
+    ADD CONSTRAINT fk_componet_stores_re_review FOREIGN KEY (id_score) REFERENCES public.review(id_score) ON UPDATE RESTRICT ON DELETE RESTRICT;
 
 
 --
--- Name: order fk_order_stores_co_componet; Type: FK CONSTRAINT; Schema: public; Owner: user
+-- Name: review fk_review_puts_revi_users; Type: FK CONSTRAINT; Schema: public; Owner: user
 --
 
-ALTER TABLE ONLY public."order"
-    ADD CONSTRAINT fk_order_stores_co_componet FOREIGN KEY (id_components) REFERENCES public.componets(id_components) ON UPDATE RESTRICT ON DELETE RESTRICT;
-
-
---
--- Name: rating fk_rating_puts_scor_users; Type: FK CONSTRAINT; Schema: public; Owner: user
---
-
-ALTER TABLE ONLY public.rating
-    ADD CONSTRAINT fk_rating_puts_scor_users FOREIGN KEY (id_user) REFERENCES public.users(id_user) ON UPDATE RESTRICT ON DELETE RESTRICT;
-
-
---
--- Name: rating fk_rating_stores_ra_componet; Type: FK CONSTRAINT; Schema: public; Owner: user
---
-
-ALTER TABLE ONLY public.rating
-    ADD CONSTRAINT fk_rating_stores_ra_componet FOREIGN KEY (id_components) REFERENCES public.componets(id_components) ON UPDATE RESTRICT ON DELETE RESTRICT;
+ALTER TABLE ONLY public.review
+    ADD CONSTRAINT fk_review_puts_revi_users FOREIGN KEY (id_user) REFERENCES public.users(id_user) ON UPDATE RESTRICT ON DELETE RESTRICT;
 
 
 --
