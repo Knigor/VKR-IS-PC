@@ -50,7 +50,7 @@
               <div class="w-[150px]">
                 <AspectRatio class="flex ml-3" :ratio="16 / 9">
                   <img
-                    :src="`/images/${item.img_components}`"
+                    :src="`http://localhost/images/${item.img_components}`"
                     alt="Пусто"
                     class="rounded-md object-cover max-w-full"
                   />

@@ -13,31 +13,32 @@ try {
     // Получаем данные из POST запроса
     $idScore = $_POST['id_score'] ?? '';
 
-    
-    // Готовим SQL-запрос
-    $stmt = $connectPDO->prepare("WITH deleted_stores_product AS (
-        DELETE FROM stores_product sp 
-        WHERE sp.id_components = :id_score
-        RETURNING *
-    )
-    DELETE FROM componets c 
-    WHERE c.id_components = :id_score");
+    $connectPDO->beginTransaction();
 
-    // Подставляем значение id_components в запрос
-    $stmt->bindParam(':id_score', $idScore, PDO::PARAM_STR);
+    // Удаляем записи из stores_product
+    $stmt1 = $connectPDO->prepare("DELETE FROM stores_product WHERE id_components = :id_score");
+    $stmt1->bindParam(':id_score', $idScore, PDO::PARAM_STR);
+    $stmt1->execute();
 
+    // Удаляем записи из stores_property
+    $stmt2 = $connectPDO->prepare("DELETE FROM stores_property WHERE id_components = :id_score");
+    $stmt2->bindParam(':id_score', $idScore, PDO::PARAM_STR);
+    $stmt2->execute();
 
-    // Выполняем запрос
-    $stmt->execute();
+    // Удаляем записи из componets
+    $stmt3 = $connectPDO->prepare("DELETE FROM componets WHERE id_components = :id_score");
+    $stmt3->bindParam(':id_score', $idScore, PDO::PARAM_STR);
+    $stmt3->execute();
+
+    // Фиксируем изменения в базе данных
+    $connectPDO->commit();
     
     // Проверяем успешность операции и отправляем соответствующий JSON
-    if ($stmt->rowCount() > 0) {
-        echo json_encode(['status' => 'Success', 'message' => 'Успешно отправлено']);
-    } else {
-        echo json_encode(['status' => 'Error', 'message' => 'Ошибка отправки']);
-    }
+    echo json_encode(['status' => 'Success', 'message' => 'Успешно отправлено']);
 
 } catch (PDOException $e) {
+    // Отменяем изменения в случае ошибки
+    $connectPDO->rollBack();
     echo json_encode(['error' => 'Ошибка подключения к базе данных: ' . $e->getMessage()]);
 }
 

@@ -89,8 +89,6 @@
               <Button @click="backPage"> Вернуться </Button>
               <Button @click="saveData"> Добавить </Button>
             </div>
-            {{ pathToFile }}
-            <img :src="pathToFile" alt="aboba" />
           </div>
         </div>
       </div>
@@ -121,6 +119,8 @@ const router = useRouter()
 const components = ref('')
 const componentsCategory = ref('')
 
+const testText = ref('ABOBA')
+
 // ниже логика добавления и удаления свойств
 
 const fields = ref([{ value: '', key: '' }])
@@ -149,10 +149,6 @@ const backPage = () => {
   router.push('/componentsView')
 }
 
-let pathToFile = ref(
-  'http://localhost/images/visual-studio-code-logo-png-transparent-vector-370692.png'
-)
-
 async function saveData() {
   // Создаем экземпляр FormData для отправки данных формы
   const formData = new FormData()
@@ -174,9 +170,13 @@ async function saveData() {
     const status = response.data.status
 
     console.log(response.data)
-    console.log(response.data.file_path)
-    pathToFile.value = response.data.file_path
     console.log('Ответ от сервера:', status)
+
+    if (status == 'success') {
+      router.push('/componentsView')
+    } else {
+      alert('Заполните все поля и попробуйте снова')
+    }
   } catch (error) {
     console.error('Ошибка при отправке данных:', error)
   }

@@ -5,7 +5,6 @@
       <div class="h-16 border-l border-orange-300"></div>
       <div class="relative w-full max-w-sm items-center">
         <Input
-          v-model="query"
           id="search"
           type="search"
           placeholder="Поиск по товару..."
@@ -44,7 +43,7 @@
             </div>
             <img
               class="border-gray-400"
-              :src="`/images/${element.img_components}`"
+              :src="`http://localhost/images/${element.img_components}`"
               alt="Пусто"
               style="max-width: 400px; max-height: 250px; object-fit: cover"
             />
@@ -218,7 +217,7 @@ let stock = ref({})
 
 let reviewVisible = ref(false)
 
-if (localStorage.length == 0) {
+if (localStorage.role == 0) {
   reviewVisible.value = false
 } else {
   reviewVisible.value = true
@@ -275,10 +274,10 @@ const pushReview = async () => {
     })
 
     if (response.data.status == 'Success') {
-      toast({
-        description: 'Ваш отзыв отправлен на модерацию'
-      })
+      alert('Сообщение успешно отправлено на модерацию')
       textReview.value = ''
+    } else {
+      alert('Заполните поля и попробуйте снова')
     }
     console.log(response.data)
   } catch (error) {
