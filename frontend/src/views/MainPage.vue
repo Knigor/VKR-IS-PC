@@ -25,7 +25,7 @@
           <button @click="goToLogOut" variant="link">Выйти</button>
           <LogOut class="cursor-pointer" @click="goToLogOut" />
         </div>
-        <div v-else class="flex gap-2 ml-[130px]">
+        <div v-else class="flex gap-2 flex-end">
           <button @click="goToLogIn" variant="link">Войти</button>
           <LogIn class="cursor-pointer" @click="goToLogIn" />
         </div>

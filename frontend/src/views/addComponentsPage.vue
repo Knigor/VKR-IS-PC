@@ -4,6 +4,7 @@
       <div class="h-full w-full flex flex-col gap-10">
         <div class="flex flex-row w-full">
           <div class="px-10 py-5 w-full">
+            <Button @click="backPage" class="ml-[-15px]" variant="link"> Вернуться </Button>
             <p class="text-xl text-inter-title mb-1">Добавление комплектующего</p>
 
             <Input
@@ -85,8 +86,7 @@
                 <input @change="handleFileUpload" id="dropzone-file" type="file" class="hidden" />
               </label>
             </div>
-            <div class="flex justify-between mt-5">
-              <Button @click="backPage"> Вернуться </Button>
+            <div class="flex justify-end mt-5">
               <Button @click="saveData"> Добавить </Button>
             </div>
           </div>
