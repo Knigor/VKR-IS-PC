@@ -193,6 +193,7 @@ const goToLogOut = () => {
   localStorage.clear()
   console.log('Клик, Выйти')
   logVisible.value = false
+  reviewVisible.value = false
   router.push('/')
 }
 
@@ -217,7 +218,7 @@ let stock = ref({})
 
 let reviewVisible = ref(false)
 
-if (localStorage.role == 0) {
+if (localStorage.length == 0) {
   reviewVisible.value = false
 } else {
   reviewVisible.value = true

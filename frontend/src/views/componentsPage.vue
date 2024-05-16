@@ -9,7 +9,7 @@
 
             <br />
 
-            <label class="text-gray-500">{{ items.name_components }}</label>
+            <label class="text-gray-500"></label>
             <div class="w-[150px] mt-5">
               <img
                 :src="`http://localhost/images/${items.img_components}`"
@@ -18,8 +18,8 @@
               />
             </div>
             <div class="flex gap-4">
-              <Input v-model="components" class="mt-5 mb-5" placeholder="Введите новое название" />
-              <Button class="mt-5"> Изменить </Button>
+              <Input v-model="components" class="mt-5 mb-5" :placeholder="items.name_components" />
+              <Button @click="changeNameComponents" class="mt-5"> Изменить </Button>
             </div>
 
             <div class="flex gap-4">
@@ -169,9 +169,49 @@ const addField = () => {
   console.log(fields.value)
 }
 
-const removeField = (index) => {
-  fields.value.splice(index, 1)
-  console.log(fields.value)
+const removeField = async (index) => {
+  const deleteProperty = new FormData()
+
+  deleteProperty.append('id_property', fields.value[index].id_property)
+
+  try {
+    const response = await axios.post('http://localhost/deleteProperies.php', deleteProperty, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+    console.log(response.data)
+
+    console.log(fields.value[index].id_property)
+
+    fields.value.splice(index, 1)
+    console.log(fields.value)
+  } catch (error) {
+    console.error('Ошибка при отправке данных:', error)
+  }
+}
+
+// изменяем название комплектующего
+
+const changeNameComponents = async () => {
+  const changeName = new FormData()
+
+  changeName.append('id_components', route.params.id)
+  changeName.append('name_components', components.value)
+
+  try {
+    const response = await axios.post('http://localhost/updateNameComponents.php', changeName, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+    console.log(response.data)
+
+    if (response.data.status == 'Success') {
+    }
+  } catch (error) {
+    console.error('Ошибка при отправке данных:', error)
+  }
 }
 
 // изменяем категорию
@@ -189,6 +229,39 @@ const changeCategory = async () => {
       }
     })
     console.log(response.data)
+  } catch (error) {
+    console.error('Ошибка при отправке данных:', error)
+  }
+}
+
+// изменяем картинку
+
+const coverImage = ref(null)
+
+const handleFileUpload = (event) => {
+  const file = event.target.files[0]
+  if (file) {
+    coverImage.value = file
+    console.log('Выбранное изображение:', file.name)
+  }
+}
+
+const changeIMG = async () => {
+  const formData = new FormData()
+  formData.append('img_components', coverImage.value)
+  formData.append('id_components', route.params.id)
+
+  try {
+    const response = await axios.post('http://localhost/updateImgComponents.php', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+    console.log(response.data)
+
+    if (response.data.Status == 'Success') {
+      window.location.reload()
+    }
   } catch (error) {
     console.error('Ошибка при отправке данных:', error)
   }
@@ -251,10 +324,6 @@ const fetchData = async () => {
   } catch (error) {
     console.error('Ошибка при отправке данных:', error)
   }
-}
-
-const changeIMG = () => {
-  console.log('Изменили картинку')
 }
 
 onMounted(() => {
